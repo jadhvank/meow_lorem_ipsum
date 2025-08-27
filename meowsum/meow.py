@@ -14,8 +14,9 @@ _DEFAULT_END_PUNCT_WEIGHTS = (
     ("?", 0.1),
     ("...", 0.05),
 )
-_DEFAULT_QUOTE_PROB = 0.08  # Chance to wrap a phrase in quotes
-_DEFAULT_COMMA_PROB = 0.12  # Per-gap probability to insert a comma (no space before, space after)
+_DEFAULT_QUOTE_PROB = 0.12  # Increased from 0.08: chance to wrap a phrase in quotes
+_Default_COMMA_PROB_OLD = 0.12
+_DEFAULT_COMMA_PROB = 0.18  # Increased from 0.12: per-gap probability to insert a comma (no space before, space after)
 
 
 def seed(value: Union[int, None]) -> None:
