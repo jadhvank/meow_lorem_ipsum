@@ -14,17 +14,17 @@ _DEFAULT_END_PUNCT_WEIGHTS = (
     ("?", 0.1),
     ("...", 0.05),
 )
-_DEFAULT_QUOTE_PROB = 0.12  # Increased from 0.08: chance to wrap a phrase in quotes
+_DEFAULT_QUOTE_PROB = 0.06  # Reduced from 0.12: chance to wrap a phrase in quotes
 _Default_COMMA_PROB_OLD = 0.12
-_DEFAULT_COMMA_PROB = 0.18  # Increased from 0.12: per-gap probability to insert a comma (no space before, space after)
+_DEFAULT_COMMA_PROB = 0.09  # Reduced from 0.18: per-gap probability to insert a comma (no space before, space after)
 
 # Inner punctuation probabilities (mid-sentence)
-_DEFAULT_INNER_EXCLAM_PROB = 0.04
-_DEFAULT_INNER_QUEST_PROB = 0.04
-_DEFAULT_INNER_ELLIPSIS_PROB = 0.03
+_DEFAULT_INNER_EXCLAM_PROB = 0.02
+_DEFAULT_INNER_QUEST_PROB = 0.02
+_DEFAULT_INNER_ELLIPSIS_PROB = 0.015
 
 # Parentheses behavior
-_DEFAULT_BRACKET_OPEN_PROB = 0.04
+_DEFAULT_BRACKET_OPEN_PROB = 0.02
 _DEFAULT_BRACKET_CLOSE_MAX_SPAN = 10
 
 
