@@ -19,13 +19,16 @@ _Default_COMMA_PROB_OLD = 0.12
 _DEFAULT_COMMA_PROB = 0.045  # Reduced again: per-gap probability to insert a comma (no space before, space after)
 
 # Inner punctuation probabilities (mid-sentence)
-_DEFAULT_INNER_EXCLAM_PROB = 0.01
-_DEFAULT_INNER_QUEST_PROB = 0.01
+_DEFAULT_INNER_EXCLAM_PROB = 0.005
+_DEFAULT_INNER_QUEST_PROB = 0.005
 _DEFAULT_INNER_ELLIPSIS_PROB = 0.0075
 
 # Parentheses behavior
-_DEFAULT_BRACKET_OPEN_PROB = 0.01
+_DEFAULT_BRACKET_OPEN_PROB = 0.02
 _DEFAULT_BRACKET_CLOSE_MAX_SPAN = 10
+
+# Optional "mew" probability (emit mew without 'o')
+_DEFAULT_MEW_PROB = 0.05
 
 
 def seed(value: Union[int, None]) -> None:
@@ -123,11 +126,20 @@ def word(
       A string like 'meow', 'meeeow', 'meeooow', etc.
     """
     # Prefer plain "meow" per bias if it fits the length cap (it does, length=4)
-    if _rng.random() < meow_bias:
+    r = _rng.random()
+    if r < meow_bias:
         out = "meow"
     else:
-        e, o = _sample_lengths(e_range, o_range, max_len)
-        out = "m" + ("e" * e) + ("o" * o) + "w"
+        # Occasionally emit "mew" (no 'o' run), respecting max_len and e_range
+        if _rng.random() < _DEFAULT_MEW_PROB:
+            cap_e = max(1, min(e_range[1], max_len - 2))
+            lo_e = max(1, e_range[0])
+            hi_e = max(lo_e, cap_e)
+            e = _rng.randint(lo_e, hi_e)
+            out = "m" + ("e" * e) + "w"
+        else:
+            e, o = _sample_lengths(e_range, o_range, max_len)
+            out = "m" + ("e" * e) + ("o" * o) + "w"
 
     if capitalize:
         out = out.capitalize()

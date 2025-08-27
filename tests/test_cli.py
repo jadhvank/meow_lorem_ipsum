@@ -3,7 +3,7 @@ import subprocess
 import sys
 
 
-WORD_RE = re.compile(r"^me+o+w$")
+WORD_RE = re.compile(r"^me+(?:o+)?w$")
 
 
 def _tokenize_phrase(phrase: str) -> list[str]:
