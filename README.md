@@ -121,6 +121,7 @@ Console script: meowsum
   - --meow-bias FLOAT           Probability a word is exactly “meow” (default 0.7)
 
 Notes:
+- Default: Running meowsum with no options prints a single paragraph of 500 words.
 - When both --phrases and --words are given, you get N phrases with exactly M words each (as requested).
 - Each word never exceeds 10 characters; samplers honor this cap.
 - Punctuation may include commas inside phrases, and terminal punctuation among ., !, ?, ...; quotes " or ' may wrap the whole phrase sometimes.

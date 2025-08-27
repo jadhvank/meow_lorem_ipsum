@@ -105,8 +105,8 @@ def main(argv: list[str] | None = None) -> int:
         print(meow.words(w))
         return 0
 
-    # Default behavior: one paragraph of meow ipsum
-    print(meow.paragraph())
+    # Default behavior: one paragraph of 500 words
+    print(meow.phrases(n=1, words_count=500))
     return 0
 
 

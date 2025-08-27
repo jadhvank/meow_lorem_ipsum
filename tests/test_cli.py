@@ -77,3 +77,11 @@ def test_cli_sentences_range_and_paragraphs_html():
     assert len(lines) == 2
     for ln in lines:
         assert ln.startswith("<p>") and ln.endswith("</p>"), f"Paragraph not HTML-wrapped: {ln!r}"
+
+
+def test_cli_default_is_single_paragraph_500_words():
+    out = _run_cli()
+    lines = [ln for ln in out.splitlines() if ln.strip()]
+    assert len(lines) == 1, f"Expected 1 paragraph line by default, got {len(lines)}: {out!r}"
+    toks = _tokenize_phrase(lines[0])
+    assert len(toks) == 500, f"Default output should be 500 words, got {len(toks)}"
