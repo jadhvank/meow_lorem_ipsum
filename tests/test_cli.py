@@ -23,6 +23,9 @@ def _tokenize_phrase(phrase: str) -> list[str]:
         while t and t[-1] in {".", "!", "?"}:
             t = t[:-1]
 
+        # Remove surrounding parentheses
+        t = t.lstrip("(").rstrip(")")
+
         # Remove any stray quotes (defensive)
         t = t.strip('"\'')
 

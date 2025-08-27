@@ -124,7 +124,7 @@ Notes:
 - Default: Running meowsum with no options prints a single paragraph of 500 words.
 - When both --phrases and --words are given, you get N phrases with exactly M words each (as requested).
 - Each word never exceeds 10 characters; samplers honor this cap.
-- Punctuation may include commas inside phrases, and terminal punctuation among ., !, ?, ...; quotes " or ' may wrap the whole phrase sometimes.
+- Punctuation can appear mid-sentence (commas, !, ?, ...), and sentences end with one of ., !, ?, .... Occasionally an entire phrase is wrapped in quotes, and a pair of parentheses may span 1–10 words.
 
 ## Rationale and behavior
 

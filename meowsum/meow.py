@@ -18,6 +18,15 @@ _DEFAULT_QUOTE_PROB = 0.12  # Increased from 0.08: chance to wrap a phrase in qu
 _Default_COMMA_PROB_OLD = 0.12
 _DEFAULT_COMMA_PROB = 0.18  # Increased from 0.12: per-gap probability to insert a comma (no space before, space after)
 
+# Inner punctuation probabilities (mid-sentence)
+_DEFAULT_INNER_EXCLAM_PROB = 0.04
+_DEFAULT_INNER_QUEST_PROB = 0.04
+_DEFAULT_INNER_ELLIPSIS_PROB = 0.03
+
+# Parentheses behavior
+_DEFAULT_BRACKET_OPEN_PROB = 0.04
+_DEFAULT_BRACKET_CLOSE_MAX_SPAN = 10
+
 
 def seed(value: Union[int, None]) -> None:
     """
@@ -138,19 +147,74 @@ def words(n: int = 1, as_list: bool = False, sep: str = " ") -> Union[str, List[
     return ws if as_list else sep.join(ws)
 
 
-def _apply_commas(tokens: List[str], comma_prob: float = _DEFAULT_COMMA_PROB) -> List[str]:
+def _apply_inner_punct_and_brackets(
+    tokens: List[str],
+    comma_prob: float = _DEFAULT_COMMA_PROB,
+    excl_prob: float = _DEFAULT_INNER_EXCLAM_PROB,
+    quest_prob: float = _DEFAULT_INNER_QUEST_PROB,
+    ellipsis_prob: float = _DEFAULT_INNER_ELLIPSIS_PROB,
+    open_bracket_prob: float = _DEFAULT_BRACKET_OPEN_PROB,
+    bracket_close_max_span: int = _DEFAULT_BRACKET_CLOSE_MAX_SPAN,
+) -> List[str]:
     """
-    Insert commas after some tokens with a small probability, excluding the last token.
+    Insert mid-sentence punctuation and optionally a single pair of parentheses.
+
+    Rules:
+      - Mid-sentence punctuation may include ',', '!', '?', '...'.
+      - Do not apply mid punctuation to the first or last token.
+      - At most one parentheses pair per phrase:
+        '(' opens at a mid position with a small probability,
+        ')' closes within 1..bracket_close_max_span tokens after opening.
     """
-    if len(tokens) < 3:
+    n = len(tokens)
+    if n < 3:
         return tokens
+
+    last_idx = n - 1
+
+    # Decide on a parentheses span (at most one)
+    open_idx: int | None = None
+    close_idx: int | None = None
+    if n >= 4 and _rng.random() < open_bracket_prob:
+        # Open cannot be the first or the last-2 (need room to close before end)
+        max_open = max(1, last_idx - 2)
+        if max_open >= 1:
+            oi = _rng.randint(1, max_open)
+            max_span = min(bracket_close_max_span, last_idx - oi)  # allow closing up to the last token
+            if max_span >= 1:
+                ci = oi + _rng.randint(1, max_span)
+                open_idx, close_idx = oi, ci
+
+    # Build output with optional punctuation and parentheses
     out: List[str] = []
-    last_idx = len(tokens) - 1
-    for i, t in enumerate(tokens):
-        if 0 < i < last_idx and _rng.random() < comma_prob:
-            out.append(t + ",")
-        else:
-            out.append(t)
+    p_sum = comma_prob + excl_prob + quest_prob + ellipsis_prob
+
+    for i, raw in enumerate(tokens):
+        t = raw
+
+        # Opening parenthesis before token (prefix)
+        if open_idx is not None and i == open_idx:
+            t = "(" + t
+
+        # Mid-sentence punctuation (exclude first and last token)
+        if 0 < i < last_idx and p_sum > 0:
+            r = _rng.random()
+            if r < p_sum:
+                if r < comma_prob:
+                    t = t + ","
+                elif r < comma_prob + excl_prob:
+                    t = t + "!"
+                elif r < comma_prob + excl_prob + quest_prob:
+                    t = t + "?"
+                else:
+                    t = t + "..."
+
+        # Closing parenthesis after token (suffix)
+        if close_idx is not None and i == close_idx:
+            t = t + ")"
+
+        out.append(t)
+
     return out
 
 
@@ -179,7 +243,7 @@ def phrase(
     tokens[0] = tokens[0].capitalize()
 
     if punctuation:
-        tokens = _apply_commas(tokens)
+        tokens = _apply_inner_punct_and_brackets(tokens)
 
     core = " ".join(tokens)
 
